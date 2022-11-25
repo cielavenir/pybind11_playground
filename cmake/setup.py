@@ -8,6 +8,10 @@ import sys
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 
+versionContext = {}
+with open('../pybind11_playground/version.py') as f:
+    exec(f.read(), versionContext)
+
 # Convert distutils Windows platform specifiers to CMake -A arguments
 PLAT_TO_CMAKE = {
     "win32": "Win32",
@@ -126,13 +130,13 @@ setup(
     name='pybind11_playground',
     description='pybind11_playground',
     long_description=open("../README.md").read(),
-    version='0.0.0.1',
+    version=versionContext['__version__'],
     url='https://github.com/cielavenir/pybind11_playground',
     license='CC0',
     author='cielavenir',
     author_email='cielartisan@gmail.com',
     #setup_requires=["pybind11"],
-    ext_modules=[CMakeExtension('pybind11_playground')],
+    ext_modules=[CMakeExtension('pybind11_playground.pybind11_playground')],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     include_package_data=True,

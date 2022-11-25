@@ -6,13 +6,17 @@ import monkeypatch_distutils
 
 from setuptools import setup
 try:
-	from pybind11.setup_helpers import Pybind11Extension
+    from pybind11.setup_helpers import Pybind11Extension
 except ImportError:
-	from setuptools import Extension as Pybind11Extension
+    from setuptools import Extension as Pybind11Extension
+
+versionContext = {}
+with open('pybind11_playground/version.py') as f:
+    exec(f.read(), versionContext)
 
 ext_modules = [
     Pybind11Extension(
-        "pybind11_playground",
+        "pybind11_playground.pybind11_playground",
         ['src/pybind11_playground.cpp'],  # Sort source files for reproducibility
         extra_compile_args=['-O2'],
         extra_link_args=['-s'],
@@ -21,14 +25,16 @@ ext_modules = [
 
 setup(
     name='pybind11_playground',
-    description='a (quick) binding for libslz',
+    description='pybind11_playground, sample build environment',
     long_description=open("README.md").read(),
-    version='0.0.0.1',
+    long_description_content_type='text/markdown',
+    version=versionContext['__version__'],
     url='https://github.com/cielavenir/pybind11_playground',
     license='CC0',
     author='cielavenir',
     author_email='cielartisan@gmail.com',
     setup_requires=["pybind11"],
+    packages=['pybind11_playground'],
     ext_modules=ext_modules,
     #cmdclass={"build_ext": build_ext},
     zip_safe=False,
