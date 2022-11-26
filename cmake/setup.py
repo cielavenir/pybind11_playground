@@ -136,6 +136,8 @@ setup(
     author='cielavenir',
     author_email='cielartisan@gmail.com',
     #setup_requires=["pybind11"],
+    package_dir = {'': '..'},
+    packages=['pybind11_playground'],
     ext_modules=[CMakeExtension('pybind11_playground.pybind11_playground')],
     cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
