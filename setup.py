@@ -17,7 +17,7 @@ with open('pybind11_playground/version.py') as f:
 ext_modules = [
     Pybind11Extension(
         "pybind11_playground.pybind11_playground",
-        ['src/pybind11_playground.cpp'],  # Sort source files for reproducibility
+        ['src/pybind11_playground.cpp', 'src/empty.c'],  # Sort source files for reproducibility
         extra_compile_args=['-O2'],
         extra_link_args=['-s'],
     ),
