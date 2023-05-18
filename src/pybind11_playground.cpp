@@ -5,6 +5,7 @@ extern "C" {
 #include <stdio.h>
 }
 
+// Be careful about PY_MAJOR_VERSION and PYBIND11_VERSION_MAJOR (the order)
 namespace py = pybind11;
 using namespace pybind11::literals;
 
@@ -16,7 +17,7 @@ public:
     void test_int1(){
         for(int i=0;i<10000;i++){
             py::object o = py::cast<py::object>(
-#if PY_VERSION_MAJOR >= 3
+#if PY_MAJOR_VERSION >= 3
                 PyLong_FromLong
 #else
                 PyInt_FromLong
@@ -25,7 +26,7 @@ public:
             );
         }
             py::object o = py::cast<py::object>(
-#if PY_VERSION_MAJOR >= 3
+#if PY_MAJOR_VERSION >= 3
                 PyLong_FromLong
 #else
                 PyInt_FromLong
@@ -37,7 +38,7 @@ public:
     void test_int2(){
         for(int i=0;i<10000;i++){
             py::object o = py::reinterpret_steal<py::object>(
-#if PY_VERSION_MAJOR >= 3
+#if PY_MAJOR_VERSION >= 3
                 PyLong_FromLong
 #else
                 PyInt_FromLong
@@ -46,7 +47,7 @@ public:
             );
         }
             py::object o = py::reinterpret_steal<py::object>(
-#if PY_VERSION_MAJOR >= 3
+#if PY_MAJOR_VERSION >= 3
                 PyLong_FromLong
 #else
                 PyInt_FromLong
