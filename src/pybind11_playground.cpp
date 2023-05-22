@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 extern "C" {
 #include <stdlib.h>
@@ -62,12 +63,25 @@ public:
     }
 
     // to check pybind11_stubgen signature
-    void show_2_ints(std::array<int, 2> ints){
-        printf("[show_2_ints] %d, %d\n", ints[0], ints[1]);
+    // https://github.com/sizmailov/pybind11-stubgen/issues/96
+    void test_show_2_ints(std::array<int, 2> ints){
+        printf("[test_show_2_ints] %d, %d\n", ints[0], ints[1]);
+    }
+
+    // to check overload stubgen order
+    // https://github.com/sizmailov/pybind11-stubgen/pull/98
+    void test_overload(py::str o){
+        puts("[test_overload] str");
+    }
+    void test_overload(py::object o){
+        puts("[test_overload] object");
     }
 };
 
 PYBIND11_MODULE(pybind11_playground, m){
+    void (toyclass::*test_overload1)(py::str) = &toyclass::test_overload;
+    void (toyclass::*test_overload2)(py::object) = &toyclass::test_overload;
+
     py::class_<toyclass, std::shared_ptr<toyclass> >(m, "toyclass")
     .def(py::init<>())
     .def("sleep", &toyclass::sleep,
@@ -75,8 +89,10 @@ PYBIND11_MODULE(pybind11_playground, m){
     )
     .def("test_int_cast", &toyclass::test_int_cast)
     .def("test_int_steal", &toyclass::test_int_steal)
-    .def("show_2_ints", &toyclass::show_2_ints,
+    .def("test_show_2_ints", &toyclass::test_show_2_ints,
         "ints"_a
     )
+    .def("test_overload", test_overload1)
+    .def("test_overload", test_overload2)
     ;
 }
