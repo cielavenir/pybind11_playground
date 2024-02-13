@@ -8,6 +8,30 @@ extern "C" {
 
 // Be careful about PY_MAJOR_VERSION and PYBIND11_VERSION_MAJOR (the order)
 
+namespace pybind11 { namespace detail {
+
+template <> struct type_caster<__uint128_t> {
+public:
+    PYBIND11_TYPE_CASTER(__uint128_t, const_name("__uint128_t"));
+    bool load(handle src, bool convert) {
+        if (isinstance<int_>(src)) {
+            if(src >= (pybind11::cast(1)<<pybind11::cast(128))){
+                return false;
+            }
+            value = __uint128_t( ((__uint128_t)(pybind11::cast<uint64_t>(src>>pybind11::cast(64)))<<64) | pybind11::cast<uint64_t>(src&pybind11::cast(0xffffffffffffffffULL)) );
+            return true;
+        }
+        return false;
+    }
+
+    static handle cast(const __uint128_t &src, return_value_policy policy, handle parent) {
+        return ((pybind11::cast((uint64_t)(src>>64)) << pybind11::cast(64)) | pybind11::cast((uint64_t)(src & 0xffffffffffffffffULL))).inc_ref();
+        //return reinterpret_borrow<object>((pybind11::cast((uint64_t)(src>>64)) << pybind11::cast(64)) | pybind11::cast((uint64_t)(src & 0xffffffffffffffffULL)));
+    }
+};
+
+}}
+
 namespace py = pybind11;
 using namespace pybind11::literals;
 
@@ -16,6 +40,15 @@ public:
     // to confirm that GIL is not released
     void sleep(int duration){
         ::sleep(duration);
+    }
+
+    __uint128_t copyUint128(__uint128_t val){
+        return val;
+    }
+
+    __uint128_t generateUint128(){
+        __uint128_t val = ((__uint128_t)(0x1234567812345678)<<64) | 0x90abcdef90abcdef;
+        return val;
     }
 
     // to confirm that reference count increases with py::cast but not py::reinterpret_steal
@@ -87,6 +120,8 @@ PYBIND11_MODULE(pybind11_playground, m){
     .def("sleep", &toyclass::sleep,
         "duration"_a
     )
+    .def("copyUint128", &toyclass::copyUint128, "arg"_a)
+    .def("generateUint128", &toyclass::generateUint128)
     .def("test_int_cast", &toyclass::test_int_cast)
     .def("test_int_steal", &toyclass::test_int_steal)
     .def("test_show_2_ints", &toyclass::test_show_2_ints,
